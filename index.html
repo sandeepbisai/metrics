@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Engineering Insights Dashboard</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #111827;
+      color: white;
+      padding: 16px 24px;
+      font-size: 22px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 64px);
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #1f2937;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar button {
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #374151;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.3s;
+      text-align: left;
+    }
+
+    .sidebar button:hover {
+      background: #2563eb;
+      transform: translateX(4px);
+    }
+
+    .content {
+      flex: 1;
+      background: white;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 10px;
+      left: 20px;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    Engineering Insights Dashboard
+  </div>
+
+  <div class="container">
+
+    <div class="sidebar">
+
+      <button onclick="loadPage('pages/engineering-metrics.html')">
+        📊 Engineering Metrics
+      </button>
+
+      <button onclick="loadPage('pages/sprint-dashboard.html')">
+        🚀 Sprint Dashboard
+      </button>
+
+      <button onclick="loadPage('pages/ticket-analytics.html')">
+        🎯 Ticket Analytics
+      </button>
+
+      <div class="footer">
+        Powered by AI Automation
+      </div>
+
+    </div>
+
+    <div class="content">
+      <iframe
+        id="dashboardFrame"
+        src="pages/engineering-metrics.html">
+      </iframe>
+    </div>
+
+  </div>
+
+  <script>
+    function loadPage(page) {
+      document.getElementById("dashboardFrame").src = page;
+    }
+  </script>
+
+</body>
+
+</html>

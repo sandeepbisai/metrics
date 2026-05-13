@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ticket metrics dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --accent: #58a6ff;
+        --success: #3fb950;
+        --warning: #d29922;
+        --danger: #f85149;
+        --neutral: #6e7681;
+        --info: #a371f7;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f6f8fa;
+          --surface: #ffffff;
+          --border: #d0d7de;
+          --text: #1f2328;
+          --muted: #656d76;
+          --accent: #0969da;
+          --success: #1a7f37;
+          --warning: #9a6700;
+          --danger: #cf222e;
+          --neutral: #57606a;
+          --info: #8250df;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        padding: 24px clamp(16px, 4vw, 48px) 48px;
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      .subtitle {
+        color: var(--muted);
+        font-size: 0.875rem;
+        margin-bottom: 24px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 14px 16px;
+      }
+      .stat-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .stat-label {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 28px 0 6px;
+      }
+      .hint {
+        font-size: 0.8125rem;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .chart-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 8px;
+        position: relative;
+        height: 280px;
+      }
+      .chart-box.compact {
+        height: 260px;
+      }
+      .chart-box.square {
+        max-width: 400px;
+        height: 320px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .chart-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+      @media (max-width: 720px) {
+        .chart-row {
+          grid-template-columns: 1fr;
+        }
+        .chart-box.square {
+          max-width: none;
+        }
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8125rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      thead th {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        color: var(--muted);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      thead th.num,
+      tbody td.num {
+        text-align: right;
+      }
+      tbody td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .foot {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Ticket metrics</h1>
+      <p class="subtitle" id="subtitle"></p>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="chart-row">
+        <div>
+          <h2>Ticket mix (share of total)</h2>
+          <p class="hint">
+            Done, regression-ready, rework, and remaining tickets. “Other” is the remainder so slices
+            sum to total tickets (adjust if your source uses overlapping categories).
+          </p>
+          <div class="chart-box square compact"><canvas id="chartMix"></canvas></div>
+        </div>
+        <div>
+          <h2>Queue-time buckets (&lt; 1h vs ≥ 1h)</h2>
+          <p class="hint">Per-ticket counts for dev vs test handling (from your export).</p>
+          <div class="chart-box compact"><canvas id="chartBuckets"></canvas></div>
+        </div>
+      </div>
+
+      <h2>Average handling time (hours)</h2>
+      <p class="hint">Parsed from average dev time and average test time in the export.</p>
+      <div class="chart-box compact" style="max-width: 520px">
+        <canvas id="chartAvgTime"></canvas>
+      </div>
+
+      <h2>Parents and defects</h2>
+      <p class="hint">Parent ticket volume, parents with bugs, and bug-linked items.</p>
+      <div class="chart-box compact"><canvas id="chartBugs"></canvas></div>
+
+      <h2>Raw export</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Total</th>
+            <th class="num">Done</th>
+            <th class="num">Regression ready</th>
+            <th class="num">Dev rework</th>
+            <th class="num">Test rework</th>
+            <th>Avg dev</th>
+            <th>Avg test</th>
+            <th class="num">Dev &lt;1h</th>
+            <th class="num">Dev ≥1h</th>
+            <th class="num">Test &lt;1h</th>
+            <th class="num">Test ≥1h</th>
+            <th class="num">Parent tickets</th>
+            <th class="num">Parents w/ bugs</th>
+            <th class="num">Bug-linked items</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <p class="foot" id="foot"></p>
+    </div>
+
+    <script>
+      /** Paste a new row by editing this object. Durations: "22h 9m" style. */
+      const DATA = {
+        totalTickets: 314,
+        doneTickets: 109,
+        regressionReady: 17,
+        devReworkTickets: 1,
+        testReworkTickets: 4,
+        averageDevTime: "22h 9m",
+        averageTestTime: "14h 1m",
+        devLessThanOneHourCount: 52,
+        devMoreThanOneHourCount: 50,
+        testLessThanOneHourCount: 55,
+        testMoreThanOneHourCount: 35,
+        totalParentTickets: 126,
+        parentTicketsHavingBugs: 18,
+        totalBugLinkedItems: 39,
+      };
+
+      function parseDurationHours(s) {
+        const m = String(s).match(/(\d+)\s*h\s*(\d+)\s*m/i);
+        if (m) return parseInt(m[1], 10) + parseInt(m[2], 10) / 60;
+        const hOnly = String(s).match(/(\d+)\s*h/i);
+        if (hOnly) return parseInt(hOnly[1], 10);
+        return 0;
+      }
+
+      const avgDevH = parseDurationHours(DATA.averageDevTime);
+      const avgTestH = parseDurationHours(DATA.averageTestTime);
+
+      const labeled =
+        DATA.doneTickets +
+        DATA.regressionReady +
+        DATA.devReworkTickets +
+        DATA.testReworkTickets;
+      const otherTickets = Math.max(0, DATA.totalTickets - labeled);
+
+      const doneRate = DATA.totalTickets
+        ? (100 * DATA.doneTickets) / DATA.totalTickets
+        : 0;
+      const reworkTotal = DATA.devReworkTickets + DATA.testReworkTickets;
+      const bugParentRate = DATA.totalParentTickets
+        ? (100 * DATA.parentTicketsHavingBugs) / DATA.totalParentTickets
+        : 0;
+
+      const css = getComputedStyle(document.documentElement);
+      const success = css.getPropertyValue("--success").trim() || "#3fb950";
+      const accent = css.getPropertyValue("--accent").trim() || "#58a6ff";
+      const warning = css.getPropertyValue("--warning").trim() || "#d29922";
+      const danger = css.getPropertyValue("--danger").trim() || "#f85149";
+      const neutral = css.getPropertyValue("--neutral").trim() || "#6e7681";
+      const info = css.getPropertyValue("--info").trim() || "#a371f7";
+      const muted = css.getPropertyValue("--muted").trim() || "#8b949e";
+      const border = css.getPropertyValue("--border").trim() || "#30363d";
+
+      const chartDefaults = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: muted, boxWidth: 12, padding: 12, font: { size: 11 } },
+          },
+        },
+      };
+
+      const scaleCommon = {
+        ticks: { color: muted },
+        grid: { color: border },
+        border: { color: border },
+      };
+
+      document.getElementById("subtitle").textContent =
+        `Single snapshot: ${DATA.totalTickets} tickets, ${DATA.doneTickets} done (${doneRate.toFixed(
+          1,
+        )}% of total). ${DATA.totalParentTickets} parent tickets; ${bugParentRate.toFixed(
+          1,
+        )}% of parents have bugs. Open this file in a browser (Chart.js loads from CDN).`;
+
+      const statBlocks = [
+        { value: String(DATA.totalTickets), label: "Total tickets" },
+        { value: String(DATA.doneTickets), label: "Done" },
+        { value: `${doneRate.toFixed(1)}%`, label: "Done / total" },
+        { value: String(DATA.regressionReady), label: "Regression ready" },
+        { value: String(reworkTotal), label: "Rework (dev + test)" },
+        { value: DATA.averageDevTime, label: "Avg dev time" },
+        { value: DATA.averageTestTime, label: "Avg test time" },
+        { value: String(DATA.totalParentTickets), label: "Parent tickets" },
+        { value: String(DATA.parentTicketsHavingBugs), label: "Parents with bugs" },
+        { value: String(DATA.totalBugLinkedItems), label: "Bug-linked items" },
+      ];
+      document.getElementById("stats").innerHTML = statBlocks
+        .map(
+          (s) =>
+            `<div class="stat"><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>`,
+        )
+        .join("");
+
+      document.getElementById("tbody").innerHTML = `<tr>
+        <td>${DATA.totalTickets}</td>
+        <td class="num">${DATA.doneTickets}</td>
+        <td class="num">${DATA.regressionReady}</td>
+        <td class="num">${DATA.devReworkTickets}</td>
+        <td class="num">${DATA.testReworkTickets}</td>
+        <td>${DATA.averageDevTime}</td>
+        <td>${DATA.averageTestTime}</td>
+        <td class="num">${DATA.devLessThanOneHourCount}</td>
+        <td class="num">${DATA.devMoreThanOneHourCount}</td>
+        <td class="num">${DATA.testLessThanOneHourCount}</td>
+        <td class="num">${DATA.testMoreThanOneHourCount}</td>
+        <td class="num">${DATA.totalParentTickets}</td>
+        <td class="num">${DATA.parentTicketsHavingBugs}</td>
+        <td class="num">${DATA.totalBugLinkedItems}</td>
+      </tr>`;
+
+      document.getElementById("foot").textContent =
+        `Timed-queue buckets sum to ${DATA.devLessThanOneHourCount + DATA.devMoreThanOneHourCount} dev and ${DATA.testLessThanOneHourCount + DATA.testMoreThanOneHourCount} test tickets (subsets of total if your export filters by stage).`;
+
+      new Chart(document.getElementById("chartMix"), {
+        type: "doughnut",
+        data: {
+          labels: ["Done", "Regression ready", "Dev rework", "Test rework", "Other"],
+          datasets: [
+            {
+              data: [
+                DATA.doneTickets,
+                DATA.regressionReady,
+                DATA.devReworkTickets,
+                DATA.testReworkTickets,
+                otherTickets,
+              ],
+              backgroundColor: [success, accent, warning, danger, neutral],
+              borderWidth: 0,
+            },
+          ],
+        },
+        options: {
+          ...chartDefaults,
+          cutout: "58%",
+          plugins: {
+            ...chartDefaults.plugins,
+            tooltip: {
+              callbacks: {
+                label(ctx) {
+                  const v = ctx.raw;
+                  const pct = DATA.totalTickets ? ((100 * v) / DATA.totalTickets).toFixed(1) : "0";
+                  return ` ${ctx.label}: ${v} (${pct}%)`;
+                },
+              },
+            },
+          },
+        },
+      });
+
+      new Chart(document.getElementById("chartBuckets"), {
+        type: "bar",
+        data: {
+          labels: ["Dev", "Test"],
+          datasets: [
+            {
+              label: "Under 1 hour",
+              data: [DATA.devLessThanOneHourCount, DATA.testLessThanOneHourCount],
+              backgroundColor: success,
+            },
+            {
+              label: "1 hour or more",
+              data: [DATA.devMoreThanOneHourCount, DATA.testMoreThanOneHourCount],
+              backgroundColor: warning,
+            },
+          ],
+        },
+        options: {
+          ...chartDefaults,
+          plugins: {
+            ...chartDefaults.plugins,
+            tooltip: { mode: "index", intersect: false },
+          },
+          scales: {
+            x: { ...scaleCommon, stacked: false },
+            y: { ...scaleCommon, beginAtZero: true, stacked: false },
+          },
+        },
+      });
+
+      new Chart(document.getElementById("chartAvgTime"), {
+        type: "bar",
+        data: {
+          labels: ["Average dev time", "Average test time"],
+          datasets: [
+            {
+              label: "Hours",
+              data: [avgDevH, avgTestH],
+              backgroundColor: [accent, info],
+            },
+          ],
+        },
+        options: {
+          ...chartDefaults,
+          indexAxis: "y",
+          plugins: {
+            ...chartDefaults.plugins,
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label(ctx) {
+                  const i = ctx.dataIndex;
+                  const raw = i === 0 ? DATA.averageDevTime : DATA.averageTestTime;
+                  return ` ${raw} (${Number(ctx.raw).toFixed(2)} h)`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: { ...scaleCommon, beginAtZero: true, title: { display: true, text: "Hours", color: muted } },
+            y: { ...scaleCommon },
+          },
+        },
+      });
+
+      new Chart(document.getElementById("chartBugs"), {
+        type: "bar",
+        data: {
+          labels: ["Parent tickets", "Parents with bugs", "Bug-linked items"],
+          datasets: [
+            {
+              label: "Count",
+              data: [
+                DATA.totalParentTickets,
+                DATA.parentTicketsHavingBugs,
+                DATA.totalBugLinkedItems,
+              ],
+              backgroundColor: [neutral, danger, warning],
+            },
+          ],
+        },
+        options: {
+          ...chartDefaults,
+          plugins: {
+            ...chartDefaults.plugins,
+            legend: { display: false },
+          },
+          scales: {
+            x: { ...scaleCommon },
+            y: { ...scaleCommon, beginAtZero: true },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
