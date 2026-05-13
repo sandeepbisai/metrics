@@ -8,6 +8,7 @@
   <title>Engineering Insights Dashboard</title>
 
   <style>
+
     * {
       margin: 0;
       padding: 0;
@@ -20,6 +21,10 @@
       overflow: hidden;
     }
 
+    /* ============================================
+       HEADER
+    ============================================ */
+
     .header {
       background: #111827;
       color: white;
@@ -29,10 +34,18 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
+    /* ============================================
+       MAIN CONTAINER
+    ============================================ */
+
     .container {
       display: flex;
       height: calc(100vh - 64px);
     }
+
+    /* ============================================
+       SIDEBAR
+    ============================================ */
 
     .sidebar {
       width: 250px;
@@ -41,6 +54,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      position: relative;
     }
 
     .sidebar button {
@@ -55,10 +69,15 @@
       text-align: left;
     }
 
-    .sidebar button:hover {
+    .sidebar button:hover,
+    .sidebar button.active {
       background: #2563eb;
       transform: translateX(4px);
     }
+
+    /* ============================================
+       CONTENT AREA
+    ============================================ */
 
     .content {
       flex: 1;
@@ -71,36 +90,57 @@
       border: none;
     }
 
+    /* ============================================
+       FOOTER
+    ============================================ */
+
     .footer {
       position: absolute;
-      bottom: 10px;
+      bottom: 15px;
       left: 20px;
       color: #9ca3af;
       font-size: 12px;
     }
+
   </style>
 </head>
 
 <body>
 
+  <!-- ============================================
+       HEADER
+  ============================================= -->
+
   <div class="header">
     Engineering Insights Dashboard
   </div>
 
+  <!-- ============================================
+       MAIN LAYOUT
+  ============================================= -->
+
   <div class="container">
+
+    <!-- ============================================
+         SIDEBAR
+    ============================================= -->
 
     <div class="sidebar">
 
-      <button onclick="loadPage('pages/bitbucket-metrics.html')">
-         BitBucket Metrics
+      <button
+        class="active"
+        onclick="loadPage('pages/bitbucket-metrics.html', this)">
+        📊 BitBucket Metrics
       </button>
 
-      <button onclick="loadPage('pages/sprint-dashboard.html')">
-         Sprint Dashboard
+      <button
+        onclick="loadPage('pages/sprint-dashboard.html', this)">
+        🚀 Sprint Dashboard
       </button>
 
-      <button onclick="loadPage('pages/ticket-analytics.html')">
-         Ticket Analytics
+      <button
+        onclick="loadPage('pages/ticket-analytics.html', this)">
+        🎯 Ticket Analytics
       </button>
 
       <div class="footer">
@@ -109,19 +149,57 @@
 
     </div>
 
+    <!-- ============================================
+         CONTENT AREA
+    ============================================= -->
+
     <div class="content">
+
       <iframe
         id="dashboardFrame"
-        src="pages/ticket-analytics.html">
+        src="pages/bitbucket-metrics.html">
       </iframe>
+
     </div>
 
   </div>
 
+  <!-- ============================================
+       JAVASCRIPT
+  ============================================= -->
+
   <script>
-    function loadPage(page) {
+
+    function loadPage(page, button) {
+
+      // Load page into iframe
       document.getElementById("dashboardFrame").src = page;
+
+      // Remove active class from all buttons
+      const buttons = document.querySelectorAll(".sidebar button");
+
+      buttons.forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      // Add active class to selected button
+      if (button) {
+        button.classList.add("active");
+      }
     }
+
+    // Set first button active on page load
+    window.onload = function () {
+
+      const firstButton =
+        document.querySelector(".sidebar button");
+
+      if (firstButton) {
+        firstButton.classList.add("active");
+      }
+
+    };
+
   </script>
 
 </body>
