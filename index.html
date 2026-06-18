@@ -8,7 +8,6 @@
   <title>Engineering Insights Dashboard</title>
 
   <style>
-
     * {
       margin: 0;
       padding: 0;
@@ -16,7 +15,7 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: #f4f7fb;
       overflow: hidden;
     }
@@ -24,7 +23,6 @@
     /* ============================================
        HEADER
     ============================================ */
-
     .header {
       background: #111827;
       color: white;
@@ -32,53 +30,84 @@
       font-size: 22px;
       font-weight: bold;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-tag {
+      font-size: 12px;
+      background: #2563eb;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* ============================================
        MAIN CONTAINER
     ============================================ */
-
     .container {
       display: flex;
-      height: calc(100vh - 64px);
+      height: calc(100vh - 61px);
     }
 
     /* ============================================
        SIDEBAR
     ============================================ */
-
     .sidebar {
-      width: 250px;
+      width: 280px;
       background: #1f2937;
       padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       position: relative;
+      border-right: 1px solid #374151;
+    }
+
+    .sidebar-section-title {
+      color: #9ca3af;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      padding-left: 6px;
     }
 
     .sidebar button {
-      padding: 14px;
+      padding: 12px 14px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       background: #374151;
-      color: white;
+      color: #e5e7eb;
       cursor: pointer;
-      font-size: 15px;
-      transition: 0.3s;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
       text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .sidebar button:hover,
+    .sidebar button:hover {
+      background: #4b5563;
+      color: white;
+      transform: translateX(4px);
+    }
+
     .sidebar button.active {
       background: #2563eb;
-      transform: translateX(4px);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
     }
 
     /* ============================================
        CONTENT AREA
     ============================================ */
-
     .content {
       flex: 1;
       background: white;
@@ -93,7 +122,6 @@
     /* ============================================
        FOOTER
     ============================================ */
-
     .footer {
       position: absolute;
       bottom: 15px;
@@ -101,46 +129,56 @@
       color: #9ca3af;
       font-size: 12px;
     }
-
   </style>
 </head>
 
 <body>
 
-  <!-- ============================================
-       HEADER
-  ============================================= -->
-
   <div class="header">
-    Engineering Insights Dashboard
+    <span>Engineering Insights Dashboard</span>
+    <span class="header-tag">Live Metrics</span>
   </div>
-
-  <!-- ============================================
-       MAIN LAYOUT
-  ============================================= -->
 
   <div class="container">
 
-    <!-- ============================================
-         SIDEBAR
-    ============================================= -->
-
     <div class="sidebar">
-
-      <button
-        class="active"
-        onclick="loadPage('pages/bitbucket-metrics.html', this)">
-        📊 BitBucket Metrics
+      
+      <div class="sidebar-section-title">Core Performance</div>
+      
+      <button class="active" onclick="loadPage('engineering_performance_comparison.html', this)">
+        📈 Performance Comparison
       </button>
 
-      <button
-        onclick="loadPage('pages/sprint-dashboard.html', this)">
-        🚀 Sprint Dashboard
+      <div class="sidebar-section-title">Analytics Reports</div>
+
+      <button onclick="loadPage('ticket-analytics May.html', this)">
+        🎯 Ticket Analytics (May)
+      </button>
+      
+      <button onclick="loadPage('sprint-dashboard May.html', this)">
+        🚀 Sprint Dashboard (May)
       </button>
 
-      <button
-        onclick="loadPage('pages/ticket-analytics.html', this)">
-        🎯 Ticket Analytics
+      <button onclick="loadPage('bitbucket-metrics May.html', this)">
+        📊 BitBucket Metrics (May)
+      </button>
+      
+      <button onclick="loadPage('aimetrics.html', this)">
+        🤖 AI Engineering Metrics
+      </button>
+
+      <div class="sidebar-section-title">Archives</div>
+      
+      <button onclick="loadPage('ticket-analytics April.html', this)">
+        📁 Ticket Analytics (April)
+      </button>
+      
+      <button onclick="loadPage('sprint-dashboard April.html', this)">
+        📁 Sprint Dashboard (April)
+      </button>
+
+      <button onclick="loadPage('bitbucket-metrics April.html', this)">
+        📁 BitBucket Metrics (April)
       </button>
 
       <div class="footer">
@@ -149,35 +187,19 @@
 
     </div>
 
-    <!-- ============================================
-         CONTENT AREA
-    ============================================= -->
-
     <div class="content">
-
-      <iframe
-        id="dashboardFrame"
-        src="pages/bitbucket-metrics.html">
-      </iframe>
-
+      <iframe id="dashboardFrame" src="engineering_performance_comparison.html"></iframe>
     </div>
 
   </div>
 
-  <!-- ============================================
-       JAVASCRIPT
-  ============================================= -->
-
   <script>
-
     function loadPage(page, button) {
-
       // Load page into iframe
       document.getElementById("dashboardFrame").src = page;
 
       // Remove active class from all buttons
       const buttons = document.querySelectorAll(".sidebar button");
-
       buttons.forEach(btn => {
         btn.classList.remove("active");
       });
@@ -188,21 +210,14 @@
       }
     }
 
-    // Set first button active on page load
+    // fallback check: highlight first button as active on initial load
     window.onload = function () {
-
-      const firstButton =
-        document.querySelector(".sidebar button");
-
-      if (firstButton) {
+      const firstButton = document.querySelector(".sidebar button");
+      if (firstButton && !document.querySelector(".sidebar button.active")) {
         firstButton.classList.add("active");
       }
-
     };
-
   </script>
 
 </body>
-
 </html>
-
