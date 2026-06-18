@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Engineering Performance Comparison Dashboard</title>
+    <style>
+      :root {
+        --bg: #f6f8fa;
+        --surface: #ffffff;
+        --border: #d0d7de;
+        --text: #1f2328;
+        --muted: #656d76;
+        --accent: #0969da;
+        --success: #1a7f37;
+        --warning: #9a6700;
+        --danger: #cf222e;
+        --neutral: #57606a;
+        --purple: #8250df;
+        --may-color: #2da44e;
+        --june-color: #0969da;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        padding: 24px clamp(16px, 4vw, 48px) 48px;
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      header {
+        margin-bottom: 32px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 16px;
+      }
+      h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      .subtitle {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0;
+      }
+      .legend-banner {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+      .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        margin-right: 6px;
+      }
+      .sec-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 32px 0 16px;
+        border-left: 4px solid var(--accent);
+        padding-left: 10px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
+      .card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--muted);
+        margin-top: 0;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .metric-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px dashed var(--border);
+      }
+      .metric-row:last-child {
+        border-bottom: none;
+      }
+      .month-label {
+        font-size: 0.85rem;
+        color: var(--neutral);
+        display: flex;
+        align-items: center;
+      }
+      .month-label::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
+      }
+      .month-label.may::before { background-color: var(--may-color); }
+      .month-label.june::before { background-color: var(--june-color); }
+      
+      .metric-val {
+        font-size: 1.15rem;
+        font-weight: 600;
+      }
+      .trend-indicator {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        margin-left: 8px;
+      }
+      .trend-better { background-color: #dafbe1; color: var(--success); }
+      .trend-worse { background-color: #ffebe9; color: var(--danger); }
+      .trend-neutral { background-color: #eaeef2; color: var(--neutral); }
+
+      .bar-comparison {
+        margin-top: 12px;
+      }
+      .bar-group {
+        margin-bottom: 10px;
+      }
+      .bar-group:last-child { margin-bottom: 0; }
+      .bar-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+      }
+      .bar-container {
+        background-color: #eaeef2;
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      .bar-fill {
+        height: 100%;
+        border-radius: 6px;
+      }
+      .bar-fill.may { background-color: var(--may-color); }
+      .bar-fill.june { background-color: var(--june-color); }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 24px;
+      }
+      th {
+        background-color: #f6f8fa;
+        padding: 12px;
+        font-weight: 600;
+        text-align: left;
+        border-bottom: 2px solid var(--border);
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:last-child td { border-bottom: none; }
+      .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+      
+      .insight-box {
+        background-color: #f0f7ff;
+        border: 1px solid #b4d4ff;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-top: 24px;
+      }
+      .insight-box h3 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 1rem;
+        color: var(--accent);
+      }
+      .insight-box ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 0.9rem;
+      }
+      .insight-box li {
+        margin-bottom: 6px;
+      }
+      .insight-box li:last-child { margin-bottom: 0; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Engineering Performance Dashboard</h1>
+        <p class="subtitle">Side-by-side executive comparison between previous data (May Cycle) and current data (June Cycle).</p>
+        <div class="legend-banner">
+          <div class="legend-item"><div class="legend-color" style="background-color: var(--may-color);"></div>May Cycle Data</div>
+          <div class="legend-item"><div class="legend-color" style="background-color: var(--june-color);"></div>June Cycle Data</div>
+        </div>
+      </header>
+
+      <!-- SECTION 1: SPRINT & TICKETS -->
+      <div class="sec-title">1. JIRA Sprint & Ticket Analytics</div>
+      <div class="grid-3">
+        <!-- Ticket Volume Card -->
+        <div class="card">
+          <p class="card-title">Velocity & Ticket Volumes</p>
+          <div class="metric-row">
+            <span class="month-label may">May Tickets</span>
+            <span class="metric-val">314</span>
+          </div>
+          <div class="metric-row">
+            <span class="month-label june">June Tickets</span>
+            <div class="metric-val">271 <span class="trend-indicator trend-neutral">-13.7%</span></div>
+          </div>
+          <div class="bar-comparison">
+            <div class="bar-group">
+              <div class="bar-header"><span>May Completed (126)</span><span>40.1%</span></div>
+              <div class="bar-container"><div class="bar-fill may" style="width: 40.1%;"></div></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-header"><span>June Completed (127)</span><span>46.9%</span></div>
+              <div class="bar-container"><div class="bar-fill june" style="width: 46.9%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bug Volume Card -->
+        <div class="card">
+          <p class="card-title">Defect & Bug Densities</p>
+          <div class="metric-row">
+            <span class="month-label may">May Bug Volume</span>
+            <span class="metric-val">144 <span class="muted" style="font-size:0.8rem;">(45.9% of total)</span></span>
+          </div>
+          <div class="metric-row">
+            <span class="month-label june">June Bug Volume</span>
+            <div class="metric-val">35 <span class="muted" style="font-size:0.8rem;">(12.9% of total)</span> <span class="trend-indicator trend-better">Healthy Drop</span></div>
+          </div>
+          <div class="bar-comparison">
+            <div class="bar-group">
+              <div class="bar-header"><span>May Bug Resolution</span><span>52.1%</span></div>
+              <div class="bar-container"><div class="bar-fill may" style="width: 52.1%;"></div></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-header"><span>June Bug Resolution</span><span>74.3%</span></div>
+              <div class="bar-container"><div class="bar-fill june" style="width: 74.3%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cycle Times Card -->
+        <div class="card">
+          <p class="card-title">Average Handling Times</p>
+          <div class="metric-row">
+            <span class="month-label may">May Dev Cycle</span>
+            <span class="metric-val">22h 09m</span>
+          </div>
+          <div class="metric-row">
+            <span class="month-label june">June Dev Cycle</span>
+            <div class="metric-val">22h 56m <span class="trend-indicator trend-neutral">Flat (+3%)</span></div>
+          </div>
+          <div class="metric-row">
+            <span class="month-label may">May Testing Cycle</span>
+            <span class="metric-val">14h 01m</span>
+          </div>
+          <div class="metric-row">
+            <span class="month-label june">June Testing Cycle</span>
+            <div class="metric-val">38h 10m <span class="trend-indicator trend-worse">+172% Slowdown</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: BITBUCKET CODE REVIEWS -->
+      <div class="sec-title">2. Bitbucket PR & Code Review Metrics</div>
+      <div class="grid-3">
+        <!-- PR Volume Card -->
+        <div class="card">
+          <p class="card-title">Pull Request Throughput</p>
+          <div class="metric-row">
+            <span class="month-label may">May Total PRs</span>
+            <span class="metric-val">166</span>
+          </div>
+          <div class="metric-row">
+            <span class="month-label june">June Total PRs</span>
+            <div class="metric-val">135 <span class="trend-indicator trend-neutral">-18.6%</span></div>
+          </div>
+          <div class="bar-comparison">
+            <div class="bar-group">
+              <div class="bar-header"><span>May PR Merge Rate</span><span>83.1%</span></div>
+              <div class="bar-container"><div class="bar-fill may" style="width: 83.1%;"></div></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-header"><span>June PR Merge Rate</span><span>80.0%</span></div>
+              <div class="bar-container"><div class="bar-fill june" style="width: 80.0%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PR Turnaround Card -->
+        <div class="card">
+          <p class="card-title">PR Turnaround Time (TAT)</p>
+          <div class="metric-row">
+            <span class="month-label may">May Avg Merge Time</span>
+            <span class="metric-val">3.6 Days</span>
+          </div>
+          <div class="metric-row">
+            <span class="month-label june">June Avg Merge Time</span>
+            <div class="metric-val">7.7 Days <span class="trend-indicator trend-worse">Slower</span></div>
+          </div>
+          <div class="metric-row">
+            <span class="month-label may">May SLA Adherence</span>
+            <span class="metric-val">97.8%</span>
+          </div>
+          <div class="metric-row">
+            <span class="month-label june">June SLA Adherence</span>
+            <div class="metric-val">93.5% <span class="trend-indicator trend-worse">-4.3% Drop</span></div>
+          </div>
+        </div>
+
+        <!-- Code Quality / Review Health Card -->
+        <div class="card">
+          <p class="card-title">Review Quality Signals</p>
+          <div class="metric-row">
+            <span class="month-label may">May Zero-Comment PRs</span>
+            <span class="metric-val">84.9%</span>
+          </div>
+          <div class="metric-row">
+            <span class="month-label june">June Zero-Comment PRs</span>
+            <div class="metric-val">69.6% <span class="trend-indicator trend-better">Improved (More Reviews)</span></div>
+          </div>
+          <div class="bar-comparison">
+            <div class="bar-group">
+              <div class="bar-header"><span>May Large PR Risk (>500 lines)</span><span>35.5%</span></div>
+              <div class="bar-container"><div class="bar-fill may" style="width: 35.5%;"></div></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar-header"><span>June Large PR Risk (>500 lines)</span><span>40.7%</span></div>
+              <div class="bar-container"><div class="bar-fill june" style="width: 40.7%;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: REPOSITORY SPECIFIC CHANGES -->
+      <div class="sec-title">3. Repository Spotlight Breakdown</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Repository Name</th>
+            <th class="num-cell">May PRs</th>
+            <th class="num-cell">June PRs</th>
+            <th class="num-cell">May Avg TAT (Days)</th>
+            <th class="num-cell">June Avg TAT (Days)</th>
+            <th class="num-cell">May No-Review %</th>
+            <th class="num-cell">June No-Review %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>marketplace</strong></td>
+            <td class="num-cell">94</td>
+            <td class="num-cell">66</td>
+            <td class="num-cell">4.21</td>
+            <td class="num-cell" style="color: var(--danger); font-weight:600;">13.90 &uarr;</td>
+            <td class="num-cell">89.36%</td>
+            <td class="num-cell" style="color: var(--success); font-weight:600;">72.73% &darr;</td>
+          </tr>
+          <tr>
+            <td><strong>marketplace-web</strong></td>
+            <td class="num-cell">50</td>
+            <td class="num-cell">36</td>
+            <td class="num-cell">2.97</td>
+            <td class="num-cell" style="color: var(--success); font-weight:600;">1.81 &darr;</td>
+            <td class="num-cell">80.00%</td>
+            <td class="num-cell">80.56%</td>
+          </tr>
+          <tr>
+            <td><strong>prefr-automation</strong></td>
+            <td class="num-cell">22</td>
+            <td class="num-cell">33</td>
+            <td class="num-cell">2.27</td>
+            <td class="num-cell" style="color: var(--danger); font-weight:600;">6.41 &uarr;</td>
+            <td class="num-cell">59.09%</td>
+            <td class="num-cell" style="color: var(--success); font-weight:600;">51.52% &darr;</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- EXECUTIVE SUMMARY INSIGHTS -->
+      <div class="insight-box">
+        <h3>💡 Executive Summary & Strategic Insights</h3>
+        <ul>
+          <li><strong>Quality Push in June:</strong> The team made massive progress cleaning up active debt, driving down overall bug ticket volume by <strong>75.7%</strong> (from 144 to 35 tickets) and lifting the bug resolution rate up to <strong>74.3%</strong>.</li>
+          <li><strong>Testing & PR Bottleneck Found:</strong> This deeper attention to quality caused longer validation feedback loops. Average QA Testing time expanded significantly to <strong>38 hours</strong>, and the core <code>marketplace</code> backend repo's PR turnaround spiked to <strong>13.9 days</strong>.</li>
+          <li><strong>Review Health is Improving:</strong> Encouragingly, developers are peer-reviewing code more often. The ratio of PRs merged with absolutely zero discussion/comments dropped from a high of <strong>84.9% down to 69.6%</strong> in June.</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

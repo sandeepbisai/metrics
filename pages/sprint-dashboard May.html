@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sprint ticket metrics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <style>
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --accent: #58a6ff;
+        --success: #3fb950;
+        --warning: #d29922;
+        --danger: #f85149;
+        --neutral: #6e7681;
+        --purple: #a371f7;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f6f8fa;
+          --surface: #ffffff;
+          --border: #d0d7de;
+          --text: #1f2328;
+          --muted: #656d76;
+          --accent: #0969da;
+          --success: #1a7f37;
+          --warning: #9a6700;
+          --danger: #cf222e;
+          --neutral: #57606a;
+          --purple: #8250df;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        padding: 24px clamp(16px, 4vw, 48px) 48px;
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      .subtitle {
+        color: var(--muted);
+        font-size: 0.875rem;
+        margin-bottom: 24px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 14px 16px;
+      }
+      .stat-value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .stat-label {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-top: 4px;
+        line-height: 1.3;
+      }
+      h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 28px 0 6px;
+      }
+      .hint {
+        font-size: 0.8125rem;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .chart-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 8px;
+        position: relative;
+        height: 300px;
+      }
+      .chart-box.tall {
+        height: 520px; /* Increased to accommodate labels */
+      }
+      .chart-box.wide-status {
+        height: 340px;
+      }
+      .chart-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      thead th {
+        text-align: left;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        color: var(--muted);
+        font-weight: 600;
+      }
+      thead th.num,
+      tbody td.num {
+        text-align: right;
+      }
+      tbody td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:nth-child(even) {
+        background: color-mix(in srgb, var(--surface) 92%, var(--bg));
+      }
+      .status-cell {
+        max-width: 340px;
+        word-break: break-word;
+        color: var(--muted);
+        font-size: 0.72rem;
+      }
+      .foot {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Sprint ticket metrics</h1>
+      <p class="subtitle" id="subtitle"></p>
+
+      <div class="stats" id="stats"></div>
+
+      <h2>Volume: Tickets & Bugs per sprint</h2>
+      <p class="hint">Side-by-side comparison. Percentages on red bars show bug-to-ticket ratio for that sprint.</p>
+      <div class="chart-box tall"><canvas id="chartCombined"></canvas></div>
+
+      <h2>Workflow mix by sprint</h2>
+      <p class="hint">
+        Percentages represent the share of each category within the total tickets for that sprint.
+      </p>
+      <div class="chart-box tall"><canvas id="chartStack"></canvas></div>
+
+      <h2>Top statuses (entire dataset)</h2>
+      <p class="hint">Counts summed across all sprints for the twelve most frequent status labels.</p>
+      <div class="chart-box wide-status"><canvas id="chartStatuses"></canvas></div>
+
+      <h2>Sprint table</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Sprint</th>
+            <th class="num">Tickets</th>
+            <th class="num">Bugs</th>
+            <th class="num">Bug %</th>
+            <th>Status counts (JSON)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <p class="foot" id="foot"></p>
+    </div>
+
+    <script>
+      // Register the datalabels plugin
+      Chart.register(ChartDataLabels);
+
+      const SPRINTS = [
+{ sprint:"MAS Phase1", totalTickets:10, bugCount:10, statuses:{"Dev-CodeReview":1,"Done":5,"CHANGE REQUIREMENT":1,"OPENED":1,"Test-InProgress":1,"Wont-Fix":1}},
+{ sprint:"NA", totalTickets:69, bugCount:20, statuses:{"Done":15,"OPENED":14,"Requirement ToDo":18,"Regression Ready":7,"Test Ready":3,"Requirement Review":5,"DEV RCA":1,"Wont-Fix":1,"Dev-CodeReview":1,"Dev-InProgress":2,"Test-ToDo":1,"IN PROGRESS":1}},
+{ sprint:"LMS_Release_60", totalTickets:15, bugCount:6, statuses:{"Test Ready":2,"Regression Ready":1,"OPENED":3,"Requirement ToDo":3,"Dev-CodeReview":1,"Requirement Review":4,"Dev-InProgress":1}},
+{ sprint:"Ops Sprint May-2", totalTickets:6, bugCount:2, statuses:{"OPENED":1,"Done":4,"Requirement ToDo":1}},
+{ sprint:"Growth Sprint May-26", totalTickets:11, bugCount:4, statuses:{"Done":7,"Requirement ToDo":4}},
+{ sprint:"Acqusition Charter - Sprint 6", totalTickets:24, bugCount:9, statuses:{"Test-InProgress":1,"Test Ready":1,"Requirement ToDo":3,"Done":11,"OPENED":5,"Dev-InProgress":2,"Duplicate":1}},
+{ sprint:"LMS_Release_59", totalTickets:10, bugCount:9, statuses:{"OPENED":2,"Wont-Fix":2,"Test-InProgress":2,"Done":4}},
+{ sprint:"Acquisition Charter - Sprint 7", totalTickets:10, bugCount:1, statuses:{"Requirement Review":5,"Requirement ToDo":3,"Requirement Acceptance":1,"OPENED":1}},
+{ sprint:"Prefr App - Ph 2.0", totalTickets:61, bugCount:61, statuses:{"Done":51,"Wont-Fix":7,"Test Ready":2,"OPENED":1}},
+{ sprint:"Prefr App - Ph 2.1", totalTickets:13, bugCount:7, statuses:{"Done":3,"OPENED":3,"Requirement ToDo":4,"Dev-CodeReview":1,"Dev-InProgress":2}},
+{ sprint:"Ops Sprint Jun-2", totalTickets:3, bugCount:0, statuses:{"Requirement Review":2,"Requirement ToDo":1}},
+{ sprint:"Acquisition Charter - Sprint 8", totalTickets:11, bugCount:1, statuses:{"Requirement Review":1,"Requirement ToDo":8,"OPENED":1,"Dev-CodeReview":1}},
+{ sprint:"Acqusition Charter - Sprint 5", totalTickets:13, bugCount:6, statuses:{"Done":10,"Dev-CodeReview":1,"Wont-Fix":1,"Requirement ToDo":1}},
+{ sprint:"Sales Voicebot MVP", totalTickets:1, bugCount:0, statuses:{"Dev-InProgress":1}},
+{ sprint:"Ops Sprint Jun-1", totalTickets:5, bugCount:0, statuses:{"Test-InProgress":2,"Done":2,"Wont-Fix":1}},
+{ sprint:"LMS_Release_58", totalTickets:5, bugCount:5, statuses:{"Done":4,"Wont-Fix":1}},
+{ sprint:"Ops Sprint May-1", totalTickets:1, bugCount:1, statuses:{"Done":1}},
+{ sprint:"Growth Sprint Apr-26", totalTickets:2, bugCount:1, statuses:{"Done":2}},
+{ sprint:"Acq Charter - Tech Hygiene", totalTickets:1, bugCount:0, statuses:{"Dev-InProgress":1}}
+];
+
+      function shortLabel(name, maxLen) {
+        if (name.length <= maxLen) return name;
+        return name.slice(0, maxLen - 1) + "…";
+      }
+
+      function workflowParts(s) {
+        const st = s.statuses;
+        const done = (st.Done || 0) + (st["Code Review done"] || 0);
+        const reg = st["Regression Ready"] || 0;
+        const wont = st["Wont-Fix"] || 0;
+        const active = Math.max(0, s.totalTickets - done - reg - wont);
+        return { done, reg, wont, active };
+      }
+
+      const sorted = [...SPRINTS].sort((a, b) => b.totalTickets - a.totalTickets);
+      const labels = sorted.map((s) => shortLabel(s.sprint, 26));
+
+      const totalTickets = SPRINTS.reduce((n, s) => n + s.totalTickets, 0);
+      const totalBugs = SPRINTS.reduce((n, s) => n + s.bugCount, 0);
+      const bugRate = totalTickets ? (100 * totalBugs) / totalTickets : 0;
+
+      const agg = {};
+      for (const s of SPRINTS) {
+        for (const [k, v] of Object.entries(s.statuses)) {
+          agg[k] = (agg[k] || 0) + v;
+        }
+      }
+      const topStatuses = Object.entries(agg)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 12);
+
+      const css = getComputedStyle(document.documentElement);
+      const success = css.getPropertyValue("--success").trim() || "#3fb950";
+      const accent = css.getPropertyValue("--accent").trim() || "#58a6ff";
+      const warning = css.getPropertyValue("--warning").trim() || "#d29922";
+      const danger = css.getPropertyValue("--danger").trim() || "#f85149";
+      const neutral = css.getPropertyValue("--neutral").trim() || "#6e7681";
+      const purple = css.getPropertyValue("--purple").trim() || "#a371f7";
+      const muted = css.getPropertyValue("--muted").trim() || "#8b949e";
+      const border = css.getPropertyValue("--border").trim() || "#30363d";
+
+      const baseOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: muted, boxWidth: 11, padding: 10, font: { size: 10 } },
+          },
+          datalabels: {
+            display: false // Default to off, enabled per-chart
+          }
+        },
+      };
+
+      const scaleCommon = {
+        ticks: { color: muted, font: { size: 10 } },
+        grid: { color: border },
+        border: { color: border },
+      };
+
+      document.getElementById("subtitle").textContent =
+        `${SPRINTS.length} sprints · ${totalTickets} tickets · ${totalBugs} bugs (${bugRate.toFixed(
+          1,
+        )}% of tickets).`;
+
+      document.getElementById("stats").innerHTML = [
+        { value: String(SPRINTS.length), label: "Sprints" },
+        { value: String(totalTickets), label: "Tickets (sum)" },
+        { value: String(totalBugs), label: "Bugs (sum)" },
+        { value: `${bugRate.toFixed(1)}%`, label: "Bugs / tickets" },
+        {
+          value: String(topStatuses[0] ? topStatuses[0][1] : 0),
+          label: `Top status count (${topStatuses[0] ? topStatuses[0][0] : "—"})`,
+        },
+      ]
+        .map(
+          (x) =>
+            `<div class="stat"><div class="stat-value">${x.value}</div><div class="stat-label">${x.label}</div></div>`,
+        )
+        .join("");
+
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = SPRINTS.map((s) => {
+        const json = JSON.stringify(s.statuses);
+        const sprPct = s.totalTickets ? (100 * s.bugCount / s.totalTickets).toFixed(1) : 0;
+        return `<tr>
+          <td>${s.sprint}</td>
+          <td class="num">${s.totalTickets}</td>
+          <td class="num">${s.bugCount}</td>
+          <td class="num">${sprPct}%</td>
+          <td class="status-cell">${json}</td>
+        </tr>`;
+      }).join("");
+
+      document.getElementById("foot").textContent =
+        "“NA” bucket holds unassigned sprint work. Percentages on charts calculated per sprint volume.";
+
+      // Combined Tickets and Bugs Chart with Percentages
+      new Chart(document.getElementById("chartCombined"), {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Total Tickets",
+              data: sorted.map((s) => s.totalTickets),
+              backgroundColor: accent,
+              categoryPercentage: 0.8,
+              barPercentage: 0.9,
+              datalabels: {
+                 display: true,
+                 align: 'end',
+                 anchor: 'end',
+                 color: muted,
+                 font: { size: 9 },
+                 formatter: (v) => v
+              }
+            },
+            {
+              label: "Bugs",
+              data: sorted.map((s) => s.bugCount),
+              backgroundColor: danger,
+              categoryPercentage: 0.8,
+              barPercentage: 0.9,
+              datalabels: {
+                 display: true,
+                 align: 'right',
+                 anchor: 'end',
+                 color: danger,
+                 font: { size: 9, weight: 'bold' },
+                 formatter: (value, context) => {
+                    const total = context.chart.data.datasets[0].data[context.dataIndex];
+                    const pct = total ? (100 * value / total).toFixed(1) : 0;
+                    return value > 0 ? `${value} (${pct}%)` : '';
+                 }
+              }
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          ...baseOpts,
+          scales: {
+            x: { ...scaleCommon, beginAtZero: true },
+            y: { ...scaleCommon },
+          },
+          plugins: {
+            ...baseOpts.plugins,
+            datalabels: {
+               // Per-dataset override handles this
+            }
+          }
+        },
+      });
+
+      const parts = sorted.map(workflowParts);
+      new Chart(document.getElementById("chartStack"), {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Done (+ code review done)",
+              data: parts.map((p) => p.done),
+              backgroundColor: success,
+              stack: "w",
+            },
+            {
+              label: "Regression ready",
+              data: parts.map((p) => p.reg),
+              backgroundColor: accent,
+              stack: "w",
+            },
+            {
+              label: "Won’t-fix",
+              data: parts.map((p) => p.wont),
+              backgroundColor: neutral,
+              stack: "w",
+            },
+            {
+              label: "Active pipeline",
+              data: parts.map((p) => p.active),
+              backgroundColor: warning,
+              stack: "w",
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          ...baseOpts,
+          plugins: {
+            ...baseOpts.plugins,
+            tooltip: { mode: "index", intersect: false },
+            datalabels: {
+               display: (context) => context.dataset.data[context.dataIndex] > 2, // Only show if bar segment is visible
+               color: '#fff',
+               font: { size: 8 },
+               formatter: (value, context) => {
+                  const total = sorted[context.dataIndex].totalTickets;
+                  const pct = total ? Math.round(100 * value / total) : 0;
+                  return pct > 5 ? `${pct}%` : ''; // Only label if > 5% space
+               }
+            }
+          },
+          scales: {
+            x: {
+              ...scaleCommon,
+              stacked: true,
+              beginAtZero: true,
+            },
+            y: { ...scaleCommon, stacked: true },
+          },
+        },
+      });
+
+      new Chart(document.getElementById("chartStatuses"), {
+        type: "bar",
+        data: {
+          labels: topStatuses.map(([k]) => shortLabel(k, 22)),
+          datasets: [
+            {
+              label: "Ticket count",
+              data: topStatuses.map(([, v]) => v),
+              backgroundColor: purple,
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          ...baseOpts,
+          plugins: { 
+            ...baseOpts.plugins, 
+            legend: { display: false },
+            datalabels: {
+              display: true,
+              align: 'end',
+              anchor: 'end',
+              color: muted,
+              font: { size: 10 }
+            }
+          },
+          scales: {
+            x: { ...scaleCommon, beginAtZero: true },
+            y: { ...scaleCommon },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

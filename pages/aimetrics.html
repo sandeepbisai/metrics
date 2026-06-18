@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Engineering Dashboard</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:Inter,Segoe UI,sans-serif;
+}
+
+body{
+background:#f5f7fa;
+padding:30px;
+color:#1e293b;
+max-width:1400px;
+margin:auto;
+}
+
+h1{
+margin:0;
+font-size:34px;
+}
+
+.subtitle{
+color:#64748b;
+margin-top:8px;
+margin-bottom:30px;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:20px;
+margin-bottom:30px;
+}
+
+.card{
+background:white;
+padding:24px;
+border-radius:18px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.label{
+font-size:13px;
+color:#64748b;
+}
+
+.value{
+font-size:34px;
+font-weight:700;
+margin-top:10px;
+}
+
+.section{
+background:white;
+padding:30px;
+border-radius:18px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+margin-bottom:30px;
+}
+
+h2{
+margin-top:0;
+}
+
+.pod{
+margin-bottom:30px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+font-weight:600;
+margin-bottom:8px;
+}
+
+.track{
+height:12px;
+background:#e5e7eb;
+border-radius:30px;
+overflow:hidden;
+margin-bottom:8px;
+}
+
+.fill{
+height:100%;
+border-radius:30px;
+}
+
+.spend{
+background:#2563eb;
+}
+
+.ticket{
+background:#10b981;
+}
+
+.legend{
+font-size:13px;
+color:#64748b;
+margin-bottom:18px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#f8fafc;
+padding:16px;
+text-align:left;
+font-size:13px;
+color:#64748b;
+}
+
+td{
+padding:18px;
+border-top:1px solid #e5e7eb;
+}
+
+.money{
+font-weight:700;
+}
+
+.time{
+color:#475569;
+}
+
+</style>
+</head>
+<body>
+
+<h1>AI Engineering Metrics Dashboard</h1>
+
+<div class="subtitle">
+AI Spend • Ticket Throughput • Dev Cycle Time • QA Cycle Time
+</div>
+
+
+<div class="cards">
+
+<div class="card">
+<div class="label">Total AI Spend</div>
+<div class="value">$4,987</div>
+</div>
+
+<div class="card">
+<div class="label">Total Tickets</div>
+<div class="value">121</div>
+</div>
+
+<div class="card">
+<div class="label">Pods</div>
+<div class="value">9</div>
+</div>
+
+<div class="card">
+<div class="label">Highest Spend</div>
+<div class="value">Acquisition</div>
+</div>
+
+</div>
+
+
+
+<div class="section">
+
+<h2>AI Spend vs Ticket Throughput</h2>
+
+<div class="legend">
+🔵 AI Spend &nbsp;&nbsp;&nbsp; 🟢 Ticket Throughput
+</div>
+
+
+<div class="pod">
+
+<div class="header">
+<span>Acquisition</span>
+<span>$1711 | 23 Tickets</span>
+</div>
+
+<div class="track">
+<div class="fill spend" style="width:100%"></div>
+</div>
+
+<div class="track">
+<div class="fill ticket" style="width:43%"></div>
+</div>
+
+</div>
+
+
+
+<div class="pod">
+
+<div class="header">
+<span>Prefr App</span>
+<span>$830 | 54 Tickets</span>
+</div>
+
+<div class="track">
+<div class="fill spend" style="width:48%"></div>
+</div>
+
+<div class="track">
+<div class="fill ticket" style="width:100%"></div>
+</div>
+
+</div>
+
+
+
+<div class="pod">
+
+<div class="header">
+<span>Ops</span>
+<span>$779 | 7 Tickets</span>
+</div>
+
+<div class="track">
+<div class="fill spend" style="width:45%"></div>
+</div>
+
+<div class="track">
+<div class="fill ticket" style="width:13%"></div>
+</div>
+
+</div>
+
+
+
+<div class="pod">
+
+<div class="header">
+<span>Growth</span>
+<span>$555 | 8 Tickets</span>
+</div>
+
+<div class="track">
+<div class="fill spend" style="width:32%"></div>
+</div>
+
+<div class="track">
+<div class="fill ticket" style="width:15%"></div>
+</div>
+
+</div>
+
+
+
+<div class="pod">
+
+<div class="header">
+<span>LMS</span>
+<span>$383 | 9 Tickets</span>
+</div>
+
+<div class="track">
+<div class="fill spend" style="width:22%"></div>
+</div>
+
+<div class="track">
+<div class="fill ticket" style="width:17%"></div>
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="section">
+
+<h2>Pod Metrics</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Pod</th>
+<th>Dev Spend</th>
+<th>QA Spend</th>
+<th>Total Spend</th>
+<th>Tickets</th>
+<th>Avg Dev Time</th>
+<th>Avg QA Time</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td><b>Prefr App</b></td>
+<td class="money">$812.14</td>
+<td>$17.80</td>
+<td class="money">$829.94</td>
+<td>54</td>
+<td class="time">20h 27m</td>
+<td class="time">36h 33m</td>
+</tr>
+
+<tr>
+<td><b>Manager</b></td>
+<td class="money">$240.02</td>
+<td>$235.69</td>
+<td class="money">$475.71</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+
+<tr>
+<td><b>Growth</b></td>
+<td class="money">$451.85</td>
+<td>$103.35</td>
+<td class="money">$555.20</td>
+<td>8</td>
+<td>24h 36m</td>
+<td>9h 57m</td>
+</tr>
+
+<tr>
+<td><b>Acquisition</b></td>
+<td class="money">$1364.01</td>
+<td>$347.21</td>
+<td class="money">$1711.22</td>
+<td>23</td>
+<td>41h 55m</td>
+<td>11h 14m</td>
+</tr>
+
+<tr>
+<td><b>Core</b></td>
+<td class="money">$252.79</td>
+<td>$0</td>
+<td class="money">$252.79</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+
+<tr>
+<td><b>Ops</b></td>
+<td class="money">$778.88</td>
+<td>$0</td>
+<td class="money">$778.88</td>
+<td>7</td>
+<td>6h 43m</td>
+<td>65h 50m</td>
+</tr>
+
+<tr>
+<td><b>TechOps</b></td>
+<td class="money">$1.19</td>
+<td>$0</td>
+<td class="money">$1.19</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+
+<tr>
+<td><b>LMS</b></td>
+<td class="money">$276.05</td>
+<td>$106.60</td>
+<td class="money">$382.65</td>
+<td>9</td>
+<td>8h 11m</td>
+<td>74h 46m</td>
+</tr>
+
+<tr>
+<td><b>NA</b></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>20</td>
+<td>9h 7m</td>
+<td>2h 56m</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>
