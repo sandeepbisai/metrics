@@ -142,42 +142,43 @@
   <div class="container">
 
     <div class="sidebar">
-      
+
       <div class="sidebar-section-title">Core Performance</div>
-      
-      <button class="active" onclick="loadPage('engineering_performance_comparison.html', this)">
+
+      <button class="active"
+        onclick="loadPage('pages/engineering_performance_comparison.html', this)">
         📈 Performance Comparison
       </button>
 
       <div class="sidebar-section-title">Analytics Reports</div>
 
-      <button onclick="loadPage('ticket-analytics May.html', this)">
+      <button onclick="loadPage('pages/ticket-analytics May.html', this)">
         🎯 Ticket Analytics (May)
       </button>
-      
-      <button onclick="loadPage('sprint-dashboard May.html', this)">
+
+      <button onclick="loadPage('pages/sprint-dashboard May.html', this)">
         🚀 Sprint Dashboard (May)
       </button>
 
-      <button onclick="loadPage('bitbucket-metrics May.html', this)">
+      <button onclick="loadPage('pages/bitbucket-metrics May.html', this)">
         📊 BitBucket Metrics (May)
       </button>
-      
-      <button onclick="loadPage('aimetrics.html', this)">
+
+      <button onclick="loadPage('pages/aimetrics.html', this)">
         🤖 AI Engineering Metrics
       </button>
 
       <div class="sidebar-section-title">Archives</div>
-      
-      <button onclick="loadPage('ticket-analytics April.html', this)">
+
+      <button onclick="loadPage('pages/ticket-analytics April.html', this)">
         📁 Ticket Analytics (April)
       </button>
-      
-      <button onclick="loadPage('sprint-dashboard April.html', this)">
+
+      <button onclick="loadPage('pages/sprint-dashboard April.html', this)">
         📁 Sprint Dashboard (April)
       </button>
 
-      <button onclick="loadPage('bitbucket-metrics April.html', this)">
+      <button onclick="loadPage('pages/bitbucket-metrics April.html', this)">
         📁 BitBucket Metrics (April)
       </button>
 
@@ -188,7 +189,10 @@
     </div>
 
     <div class="content">
-      <iframe id="dashboardFrame" src="engineering_performance_comparison.html"></iframe>
+      <iframe
+        id="dashboardFrame"
+        src="pages/engineering_performance_comparison.html">
+      </iframe>
     </div>
 
   </div>
@@ -199,25 +203,22 @@
       document.getElementById("dashboardFrame").src = page;
 
       // Remove active class from all buttons
-      const buttons = document.querySelectorAll(".sidebar button");
-      buttons.forEach(btn => {
-        btn.classList.remove("active");
-      });
+      document.querySelectorAll(".sidebar button")
+        .forEach(btn => btn.classList.remove("active"));
 
-      // Add active class to selected button
-      if (button) {
-        button.classList.add("active");
-      }
+      // Set active button
+      button.classList.add("active");
     }
 
-    // fallback check: highlight first button as active on initial load
+    // Ensure first button stays active on page load
     window.onload = function () {
       const firstButton = document.querySelector(".sidebar button");
-      if (firstButton && !document.querySelector(".sidebar button.active")) {
+      if (firstButton) {
         firstButton.classList.add("active");
       }
     };
   </script>
 
 </body>
+
 </html>
