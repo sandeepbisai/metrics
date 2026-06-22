@@ -165,17 +165,6 @@
 
       <h2>Merge rate by repository</h2>
       <div class="chart-box"><canvas id="chartMerge"></canvas></div>
-
-      <h2>Turnaround: average vs p90 (days)</h2>
-      <p class="hint">Typical merge time compared with the slow tail per repo.</p>
-      <div class="chart-box tall"><canvas id="chartTat"></canvas></div>
-
-      <h2>Review and size signals</h2>
-      <div class="chart-row">
-        <div>
-          <p class="hint" style="margin-top: 0">Large PRs and no-review rate (%)</p>
-          <div class="chart-box"><canvas id="chartReview"></canvas></div>
-        </div>
       </div>
 
       <h2>Repository detail</h2>
@@ -407,65 +396,6 @@
         },
       });
 
-      new Chart(document.getElementById("chartTat"), {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Avg TAT (d)",
-              data: ROWS.map((r) => r.avgTat),
-              borderColor: accent,
-              backgroundColor: accent + "33",
-              fill: true,
-              tension: 0.25,
-            },
-            {
-              label: "p90 TAT (d)",
-              data: ROWS.map((r) => r.p90Tat),
-              borderColor: warning,
-              backgroundColor: warning + "22",
-              fill: true,
-              tension: 0.25,
-            },
-          ],
-        },
-        options: {
-          ...chartDefaults,
-          plugins: { ...chartDefaults.plugins, tooltip: { mode: "index", intersect: false } },
-          scales: {
-            ...chartDefaults.scales,
-            y: { ...chartDefaults.scales.y, beginAtZero: true },
-          },
-        },
-      });
-
-      new Chart(document.getElementById("chartReview"), {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Large PR %",
-              data: ROWS.map((r) => r.largePrPercent),
-              backgroundColor: warning,
-            },
-            {
-              label: "Zero Comments on PR %",
-              data: ROWS.map((r) => r.noReviewPercent),
-              backgroundColor: danger,
-            },
-          ],
-        },
-        options: {
-          ...chartDefaults,
-          plugins: { ...chartDefaults.plugins, tooltip: { mode: "index", intersect: false } },
-          scales: {
-            ...chartDefaults.scales,
-            y: { ...chartDefaults.scales.y, beginAtZero: true, max: 100 },
-          },
-        },
-      });
-    </script>
+      </script>
   </body>
 </html>
