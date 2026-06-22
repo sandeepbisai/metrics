@@ -338,7 +338,7 @@
         type: "bar",
         data: {
           labels: ["Parent tickets", "Bug-linked items", "Total Bugs"],
-          datasets: [{ label: "Count", data: [DATA.totalParentTickets, DATA.totalBugLinkedItems, DATA.totalBugTickets], backgroundColor: [neutral, warning, danger] }],
+          datasets: [{ label: "Count", data: [DATA.totalParentTickets, DATA.parentTicketsHavingBugs, DATA.totalBugLinkedItems], backgroundColor: [neutral, warning, danger] }],
         },
         options: { ...chartDefaults, plugins: { legend: { display: false } }, scales: { x: scaleCommon, y: { ...scaleCommon, beginAtZero: true } } },
       });
