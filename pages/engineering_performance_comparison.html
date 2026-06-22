@@ -17,8 +17,8 @@
         --danger: #cf222e;
         --neutral: #57606a;
         --purple: #8250df;
-        --may-color: #2da44e;
-        --june-color: #0969da;
+        --April-color: #2da44e;
+        --May-color: #0969da;
       }
       * {
         box-sizing: border-box;
@@ -120,8 +120,8 @@
         border-radius: 50%;
         margin-right: 6px;
       }
-      .month-label.may::before { background-color: var(--may-color); }
-      .month-label.june::before { background-color: var(--june-color); }
+      .month-label.April::before { background-color: var(--April-color); }
+      .month-label.May::before { background-color: var(--May-color); }
       
       .metric-val {
         font-size: 1.15rem;
@@ -161,8 +161,8 @@
         height: 100%;
         border-radius: 6px;
       }
-      .bar-fill.may { background-color: var(--may-color); }
-      .bar-fill.june { background-color: var(--june-color); }
+      .bar-fill.April { background-color: var(--April-color); }
+      .bar-fill.May { background-color: var(--May-color); }
 
       table {
         width: 100%;
@@ -216,10 +216,10 @@
     <div class="wrap">
       <header>
         <h1>Engineering Performance Dashboard</h1>
-        <p class="subtitle">Side-by-side executive comparison between previous data (May Cycle) and current data (June Cycle).</p>
+        <p class="subtitle">Side-by-side executive comparison between previous data (April Cycle) and current data (May Cycle).</p>
         <div class="legend-banner">
-          <div class="legend-item"><div class="legend-color" style="background-color: var(--may-color);"></div>May Cycle Data</div>
-          <div class="legend-item"><div class="legend-color" style="background-color: var(--june-color);"></div>June Cycle Data</div>
+          <div class="legend-item"><div class="legend-color" style="background-color: var(--April-color);"></div>April Cycle Data</div>
+          <div class="legend-item"><div class="legend-color" style="background-color: var(--May-color);"></div>May Cycle Data</div>
         </div>
       </header>
 
@@ -230,21 +230,21 @@
         <div class="card">
           <p class="card-title">Velocity & Ticket Volumes</p>
           <div class="metric-row">
-            <span class="month-label may">May Tickets</span>
+            <span class="month-label April">April Tickets</span>
             <span class="metric-val">314</span>
           </div>
           <div class="metric-row">
-            <span class="month-label june">June Tickets</span>
+            <span class="month-label May">May Tickets</span>
             <div class="metric-val">271 <span class="trend-indicator trend-neutral">-13.7%</span></div>
           </div>
           <div class="bar-comparison">
             <div class="bar-group">
-              <div class="bar-header"><span>May Completed (126)</span><span>40.1%</span></div>
-              <div class="bar-container"><div class="bar-fill may" style="width: 40.1%;"></div></div>
+              <div class="bar-header"><span>April Completed (126)</span><span>40.1%</span></div>
+              <div class="bar-container"><div class="bar-fill April" style="width: 40.1%;"></div></div>
             </div>
             <div class="bar-group">
-              <div class="bar-header"><span>June Completed (127)</span><span>46.9%</span></div>
-              <div class="bar-container"><div class="bar-fill june" style="width: 46.9%;"></div></div>
+              <div class="bar-header"><span>May Completed (127)</span><span>46.9%</span></div>
+              <div class="bar-container"><div class="bar-fill May" style="width: 46.9%;"></div></div>
             </div>
           </div>
         </div>
@@ -253,21 +253,21 @@
         <div class="card">
           <p class="card-title">Defect & Bug Densities</p>
           <div class="metric-row">
-            <span class="month-label may">May Bug Volume</span>
+            <span class="month-label April">April Bug Volume</span>
             <span class="metric-val">144 <span class="muted" style="font-size:0.8rem;">(45.9% of total)</span></span>
           </div>
           <div class="metric-row">
-            <span class="month-label june">June Bug Volume</span>
+            <span class="month-label May">May Bug Volume</span>
             <div class="metric-val">35 <span class="muted" style="font-size:0.8rem;">(12.9% of total)</span> <span class="trend-indicator trend-better">Healthy Drop</span></div>
           </div>
           <div class="bar-comparison">
             <div class="bar-group">
-              <div class="bar-header"><span>May Bug Resolution</span><span>52.1%</span></div>
-              <div class="bar-container"><div class="bar-fill may" style="width: 52.1%;"></div></div>
+              <div class="bar-header"><span>April Bug Resolution</span><span>52.1%</span></div>
+              <div class="bar-container"><div class="bar-fill April" style="width: 52.1%;"></div></div>
             </div>
             <div class="bar-group">
-              <div class="bar-header"><span>June Bug Resolution</span><span>74.3%</span></div>
-              <div class="bar-container"><div class="bar-fill june" style="width: 74.3%;"></div></div>
+              <div class="bar-header"><span>May Bug Resolution</span><span>74.3%</span></div>
+              <div class="bar-container"><div class="bar-fill May" style="width: 74.3%;"></div></div>
             </div>
           </div>
         </div>
@@ -276,19 +276,19 @@
         <div class="card">
           <p class="card-title">Average Handling Times</p>
           <div class="metric-row">
-            <span class="month-label may">May Dev Cycle</span>
+            <span class="month-label April">April Dev Cycle</span>
             <span class="metric-val">22h 09m</span>
           </div>
           <div class="metric-row">
-            <span class="month-label june">June Dev Cycle</span>
+            <span class="month-label May">May Dev Cycle</span>
             <div class="metric-val">22h 56m <span class="trend-indicator trend-neutral">Flat (+3%)</span></div>
           </div>
           <div class="metric-row">
-            <span class="month-label may">May Testing Cycle</span>
+            <span class="month-label April">April Testing Cycle</span>
             <span class="metric-val">14h 01m</span>
           </div>
           <div class="metric-row">
-            <span class="month-label june">June Testing Cycle</span>
+            <span class="month-label May">May Testing Cycle</span>
             <div class="metric-val">38h 10m <span class="trend-indicator trend-worse">+172% Slowdown</span></div>
           </div>
         </div>
@@ -301,21 +301,21 @@
         <div class="card">
           <p class="card-title">Pull Request Throughput</p>
           <div class="metric-row">
-            <span class="month-label may">May Total PRs</span>
+            <span class="month-label April">April Total PRs</span>
             <span class="metric-val">166</span>
           </div>
           <div class="metric-row">
-            <span class="month-label june">June Total PRs</span>
+            <span class="month-label May">May Total PRs</span>
             <div class="metric-val">135 <span class="trend-indicator trend-neutral">-18.6%</span></div>
           </div>
           <div class="bar-comparison">
             <div class="bar-group">
-              <div class="bar-header"><span>May PR Merge Rate</span><span>83.1%</span></div>
-              <div class="bar-container"><div class="bar-fill may" style="width: 83.1%;"></div></div>
+              <div class="bar-header"><span>April PR Merge Rate</span><span>83.1%</span></div>
+              <div class="bar-container"><div class="bar-fill April" style="width: 83.1%;"></div></div>
             </div>
             <div class="bar-group">
-              <div class="bar-header"><span>June PR Merge Rate</span><span>80.0%</span></div>
-              <div class="bar-container"><div class="bar-fill june" style="width: 80.0%;"></div></div>
+              <div class="bar-header"><span>May PR Merge Rate</span><span>80.0%</span></div>
+              <div class="bar-container"><div class="bar-fill May" style="width: 80.0%;"></div></div>
             </div>
           </div>
         </div>
@@ -324,19 +324,19 @@
         <div class="card">
           <p class="card-title">PR Turnaround Time (TAT)</p>
           <div class="metric-row">
-            <span class="month-label may">May Avg Merge Time</span>
+            <span class="month-label April">April Avg Merge Time</span>
             <span class="metric-val">3.6 Days</span>
           </div>
           <div class="metric-row">
-            <span class="month-label june">June Avg Merge Time</span>
+            <span class="month-label May">May Avg Merge Time</span>
             <div class="metric-val">7.7 Days <span class="trend-indicator trend-worse">Slower</span></div>
           </div>
           <div class="metric-row">
-            <span class="month-label may">May SLA Adherence</span>
+            <span class="month-label April">April SLA Adherence</span>
             <span class="metric-val">97.8%</span>
           </div>
           <div class="metric-row">
-            <span class="month-label june">June SLA Adherence</span>
+            <span class="month-label May">May SLA Adherence</span>
             <div class="metric-val">93.5% <span class="trend-indicator trend-worse">-4.3% Drop</span></div>
           </div>
         </div>
@@ -345,21 +345,21 @@
         <div class="card">
           <p class="card-title">Review Quality Signals</p>
           <div class="metric-row">
-            <span class="month-label may">May Zero-Comment PRs</span>
+            <span class="month-label April">April Zero-Comment PRs</span>
             <span class="metric-val">84.9%</span>
           </div>
           <div class="metric-row">
-            <span class="month-label june">June Zero-Comment PRs</span>
+            <span class="month-label May">May Zero-Comment PRs</span>
             <div class="metric-val">69.6% <span class="trend-indicator trend-better">Improved (More Reviews)</span></div>
           </div>
           <div class="bar-comparison">
             <div class="bar-group">
-              <div class="bar-header"><span>May Large PR Risk (>500 lines)</span><span>35.5%</span></div>
-              <div class="bar-container"><div class="bar-fill may" style="width: 35.5%;"></div></div>
+              <div class="bar-header"><span>April Large PR Risk (>500 lines)</span><span>35.5%</span></div>
+              <div class="bar-container"><div class="bar-fill April" style="width: 35.5%;"></div></div>
             </div>
             <div class="bar-group">
-              <div class="bar-header"><span>June Large PR Risk (>500 lines)</span><span>40.7%</span></div>
-              <div class="bar-container"><div class="bar-fill june" style="width: 40.7%;"></div></div>
+              <div class="bar-header"><span>May Large PR Risk (>500 lines)</span><span>40.7%</span></div>
+              <div class="bar-container"><div class="bar-fill May" style="width: 40.7%;"></div></div>
             </div>
           </div>
         </div>
@@ -371,12 +371,12 @@
         <thead>
           <tr>
             <th>Repository Name</th>
+            <th class="num-cell">April PRs</th>
             <th class="num-cell">May PRs</th>
-            <th class="num-cell">June PRs</th>
+            <th class="num-cell">April Avg TAT (Days)</th>
             <th class="num-cell">May Avg TAT (Days)</th>
-            <th class="num-cell">June Avg TAT (Days)</th>
+            <th class="num-cell">April No-Review %</th>
             <th class="num-cell">May No-Review %</th>
-            <th class="num-cell">June No-Review %</th>
           </tr>
         </thead>
         <tbody>
@@ -414,9 +414,9 @@
       <div class="insight-box">
         <h3>💡 Executive Summary & Strategic Insights</h3>
         <ul>
-          <li><strong>Quality Push in June:</strong> The team made massive progress cleaning up active debt, driving down overall bug ticket volume by <strong>75.7%</strong> (from 144 to 35 tickets) and lifting the bug resolution rate up to <strong>74.3%</strong>.</li>
+          <li><strong>Quality Push in May:</strong> The team made massive progress cleaning up active debt, driving down overall bug ticket volume by <strong>75.7%</strong> (from 144 to 35 tickets) and lifting the bug resolution rate up to <strong>74.3%</strong>.</li>
           <li><strong>Testing & PR Bottleneck Found:</strong> This deeper attention to quality caused longer validation feedback loops. Average QA Testing time expanded significantly to <strong>38 hours</strong>, and the core <code>marketplace</code> backend repo's PR turnaround spiked to <strong>13.9 days</strong>.</li>
-          <li><strong>Review Health is Improving:</strong> Encouragingly, developers are peer-reviewing code more often. The ratio of PRs merged with absolutely zero discussion/comments dropped from a high of <strong>84.9% down to 69.6%</strong> in June.</li>
+          <li><strong>Review Health is Improving:</strong> Encouragingly, developers are peer-reviewing code more often. The ratio of PRs merged with absolutely zero discussion/comments dropped from a high of <strong>84.9% down to 69.6%</strong> in May.</li>
         </ul>
       </div>
     </div>
